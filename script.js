@@ -1,16 +1,29 @@
 
 const express= require('express')
-function sum(n){
-  let ans=0;
-  for(let i=1;i<=n;i++){
-    ans=ans+i;
-  }
-  return ans;
-}
-const app = express();
-app.get('/', function (req, res) {
-    const n = req.query.n;
-    const ans =sum(n)
-    res.send("hey there! Your Answer is:"+ans)
-  })
-  app.listen(3000);
+ const users =[
+  {
+     name:"john",
+     kidney:[{
+      healthy:false
+     }]
+  },
+   {
+     name:"jane",
+     kidney:[{
+      healthy:true
+     }]
+   }
+   ]
+ const app= express();
+ app.get("/john",function(req,res){
+  const johnkidney=users[0].kidney;
+   console.log(johnkidney);
+   res.send(johnkidney)
+ })
+ 
+ app.get("/jane",function(req,res){
+  const janekidney=users[1].kidney;
+   console.log(janekidney);
+   res.send(janekidney); 
+ })
+ app.listen(3000);
