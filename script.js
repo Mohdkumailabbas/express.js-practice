@@ -1,3 +1,7 @@
-const math =require(`./math`);
-console.log(math.sub(5,4))
-console.log(math.sum(3,4))
+//how to make server using node js
+const http=require("http");
+const myserver=http.createServer((req,res)=>{
+    console.log("new req recieved");
+    res.end("hello from server");
+});
+myserver.listen(3000);
