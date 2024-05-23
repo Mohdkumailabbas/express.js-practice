@@ -1,15 +1,36 @@
-const http= require("http");
+const { error } = require("console");
+const users= require("./MOCK_DATA.json");
 const express = require("express");
 const app=express();
-app.get("/",(req,res)=>{
-     return res.end("hey love!");
-})
-app.get("/about",(req,res)=>{
-     return res.end("hey sir!"+"hey"+req.query.name);
-})
-const myserver=http.createServer(app);
+const fs = require("fs");
+//middleware
+app.use(express.urlencoded({extended:false}));
+//listing  all users 
+//learning how to use /api
+    app.get("/api/users",(req,res)=>{
+      console.log("new req recieved");
+      return res.json(users);
+ });
+// //finding user by user id
+app.route("/api/users/:id")//using mutlpe method on one route
+.get((req,res)=>{
+     const id=Number(req.params.id);//getting id
+     const user =users.find((user)=> user.id===id);
+     return res.json(user);
+});
+app.post("/api/users",(req,res)=>{
+    const body= req.body;
+    users.push({...body,id: users.length+1});//pushing data recieved by user(array concept)
+    fs.writeFile(`./MOCK_DATA.json`, JSON.stringify(users),(err)=>{
+        return res.json({status: "pending"});
+    })
+});
+    
+    
+  
 
-myserver.listen(3000, () => {
+
+app.listen(3000, () => {
     console.log("Server is listening on port 3000");
 });
 
