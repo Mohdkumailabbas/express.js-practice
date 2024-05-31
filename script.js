@@ -1,46 +1,83 @@
-const { error } = require("console");
-const users= require("./MOCK_DATA.json");
 const express = require("express");
-const app=express();
-const fs = require("fs");
-//middleware
-app.use(express.urlencoded({extended:false}));
-//listing  all users 
-//learning how to use /api
-    app.get("/api/users",(req,res)=>{
-      console.log("new req recieved");
-      return res.json(users);
- });
-// //finding user by user id
-app.route("/api/users/:id")//using mutlpe method on one route
-.get((req,res)=>{
-     const id=Number(req.params.id);//getting id
-     const user =users.find((user)=> user.id===id);
-     return res.json(user);
-});
-app.post("/api/users",(req,res)=>{
-    const body= req.body;
-    users.push({...body,id: users.length+1});//pushing data recieved by user(array concept)
-    fs.writeFile(`./MOCK_DATA.json`, JSON.stringify(users),(err)=>{
-        return res.json({status: "pending"});
-    })
-});
-    
-    
-  
+const jwt = require("jsonwebtoken");
+const jwtPassword = "123456";
+const app = express();
+app.use(express.json());
 
+const allUsers = [
+    {
+        username: "codewithme@gmail.com",
+        password: "123",
+        name: "cody"
+    },
+    {
+        username: "kkkk@gmail.com",
+        password: "1023",
+        name: "kkkk"
+    },
+    {
+        username: "orry@gmail.com",
+        password: "1253",
+        name: "orry"
+    }
+];
 
+// Function to check if the user exists
+function userExists(username, password) {
+    let userExists = false;
+    for (let i = 0; i < allUsers.length; i++) {
+        if (allUsers[i].username === username && allUsers[i].password === password) {
+            userExists = true;
+            break;
+        }
+    }
+    return userExists;
+}
+
+// Sign-in route to generate a JWT token
+app.post("/signin", (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    // Check if the user exists
+    if (!userExists(username, password)) {
+        return res.status(403).json({
+            msg: "User does not exist"
+        });
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign({ username: username }, jwtPassword);
+    return res.json({
+        token
+    });
+});
+
+// Route to get all users, requires a valid JWT token
+app.get("/users", (req, res) => {
+    const token = req.headers.authorization;
+
+    try {
+        // Verify the token
+        const decoded = jwt.verify(token, jwtPassword);
+        const username = decoded.username;
+
+        // Send the list of all users
+        res.json({
+            users: allUsers
+        });
+    } catch (err) {
+        // Send an error response if the token is invalid
+        return res.status(401).json({
+            msg: "Invalid token"
+        });
+    }
+});
+
+// Start the server
 app.listen(3000, () => {
-    console.log("Server is listening on port 3000");
+    console.log("Server is running on port 3000");
 });
-
-
-
-
-
-
-
-
 
 
 
