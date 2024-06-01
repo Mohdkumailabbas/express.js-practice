@@ -3,48 +3,38 @@ const jwt = require("jsonwebtoken");
 const jwtPassword = "123456";
 const app = express();
 app.use(express.json());
-
-const allUsers = [
-    {
-        username: "codewithme@gmail.com",
-        password: "123",
-        name: "cody"
-    },
-    {
-        username: "kkkk@gmail.com",
-        password: "1023",
-        name: "kkkk"
-    },
-    {
-        username: "orry@gmail.com",
-        password: "1253",
-        name: "orry"
-    }
-];
-
-// Function to check if the user exists
-function userExists(username, password) {
-    let userExists = false;
-    for (let i = 0; i < allUsers.length; i++) {
-        if (allUsers[i].username === username && allUsers[i].password === password) {
-            userExists = true;
-            break;
-        }
-    }
-    return userExists;
-}
-
+const mongoose =require("mongoose");
+mongoose.connect("mongodb+srv://cluster0.rff7edc.mongodb.net/user_app")
+const User =mongoose.model('Users',{
+    name:"string",
+    email:"string",
+    password:"string"
+});
 // Sign-in route to generate a JWT token
 app.post("/signin", (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
+    const body = req.body.name;
+    const existinguser=await.findOne({email:username});
+     if(existinguser){
+        return res.status(404).send("username exists");
+     }
+     const user = new User ({
+        name:`Spidy`,
+        email:`spidy78@gmail.com`,
+        password:`12345678`
+    })
+    user.save();
+    res.json({
+        "msg":"user created succesfully"
+    })
 
     // Check if the user exists
-    if (!userExists(username, password)) {
-        return res.status(403).json({
-            msg: "User does not exist"
-        });
-    }
+    // if (!userExists(username, password)) {
+    //     return res.status(403).json({
+    //         msg: "User does not exist"
+    //     });
+    // }
 
     // Generate a JWT token
     const token = jwt.sign({ username: username }, jwtPassword);
@@ -78,8 +68,6 @@ app.get("/users", (req, res) => {
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
 });
-
-
 
 
 
