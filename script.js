@@ -13,26 +13,22 @@ const usermodel= require('./zod');
     })
     res.json(createdata);
  })
+ app.get("/update",async (req,res)=>{
+    let  updatedata = await usermodel.findOneAndUpdate({name:"aka"},{name:"sjdn"},{new:true})
+   res.json(updatedata);
+})
+app.get("/read",async (req,res)=>{
+    let  readdata = await usermodel.find()
+   res.json(readdata);
+})
+app.get("/delete",async (req,res)=>{
+    let  deletedata = await usermodel.findOneAndDelete({name:"sjdn"});
+   res.json(deletedata);
+})
 
  app.listen(3000);
 
- const mongoose =require("mongoose");
- mongoose.connect(`mongodb://127.0.0.1:27017/practice`)
- const UserSchema = new mongoose.Schema({
-     name:"string",
-     email:"string",
-     password:"string"
- });
- mongoose.model("user",UserSchema);
- // const user = new User ({
- //     name:`Spidy`,
- //     email:`spidy78@gmail.com`,
- //     password:`12345678`
- // })
- // user.save();
  
- module.exports=mongoose.model("user",UserSchema);
-
  
 
 
